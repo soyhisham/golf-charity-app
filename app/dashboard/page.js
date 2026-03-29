@@ -5,12 +5,13 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function DashboardPage() {
+// 1. We rename your main logic to an inner component
+function DashboardContent() {
   const [profile, setProfile] = useState(null)
   const [scores, setScores] = useState([])
   const [charity, setCharity] = useState(null)
@@ -276,5 +277,24 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// 2. This is the new wrapper component that satisfies Next.js 16 build rules
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-slate-400 flex items-center gap-3">
+          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          Loading your dashboard...
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   )
 }
